@@ -16,6 +16,9 @@ jobs:
         registry: docker.io
         username: ${{ secrets.DOCKER_HUB_USER }}
         password: ${{ secrets.DOCKER_HUB_PASS }}
+    - name: Get git sha short
+      id: vars
+      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
     - id: setup-pack
       uses: buildpacks/github-actions/setup-pack@v4.4.0
     - id: package
@@ -25,6 +28,7 @@ jobs:
         BP_ID="heroku/python"
         VERSION="0.3.1"
         PACKAGE="${REPO}/$(echo "$BP_ID" | sed 's/\//_/g')"
+        pack build --path .  --publish ${REPO}/cnb:sha-${{ steps.vars.outputs.sha_short }}
         pack buildpack package --publish ${PACKAGE}:${VERSION}
         DIGEST="$(crane digest ${PACKAGE}:${VERSION})"
         echo "::set-output name=bp_id::$BP_ID"
@@ -41,9 +45,7 @@ jobs:
         version: ${{ steps.package.outputs.version }}
         address: ${{ steps.package.outputs.address }}
 
-    - name: Get git sha short
-      id: vars
-      run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
+
         
     - name: Generate deploy manifest from Jinja template
       uses: cuchi/jinja2-action@v1.1.0
