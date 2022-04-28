@@ -24,7 +24,6 @@ jobs:
     - id: package
       run: |
         #!/usr/bin/env bash
-        set -euo pipefail
         pack build --path .  --builder heroku/buildpacks:20 --publish ${REPO}/cnb:sha-${{ steps.vars.outputs.sha_short }}  
       shell: bash
       env:
