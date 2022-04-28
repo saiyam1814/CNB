@@ -25,23 +25,11 @@ jobs:
       run: |
         #!/usr/bin/env bash
         set -euo pipefail
-        BP_ID="heroku/python"
-        VERSION="0.3.1"
-        PACKAGE="${REPO}/$(echo "$BP_ID" | sed 's/\//_/g')"
         pack build --path .  --builder heroku/buildpacks:20 --publish ${REPO}/cnb:sha-${{ steps.vars.outputs.sha_short }}  
       shell: bash
       env:
         REPO: docker.io/${{ secrets.DOCKER_HUB_USER }}
-    - id: register
-      uses: docker://ghcr.io/buildpacks/actions/registry/request-add-entry:4.4.0
-      with:
-        token:   ${{ secrets.PUBLIC_REPO_TOKEN }}
-        id:      ${{ steps.package.outputs.bp_id }}
-        version: ${{ steps.package.outputs.version }}
-        address: ${{ steps.package.outputs.address }}
 
-
-        
     - name: Generate deploy manifest from Jinja template
       uses: cuchi/jinja2-action@v1.1.0
       with: 
